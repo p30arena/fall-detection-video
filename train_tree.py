@@ -13,18 +13,15 @@ csv_files = glob('out/*.csv')
 files_data = []
 df = None
 
-pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
-             columns=['a', 'b', 'c'])
 for f in csv_files:
     with open(f, newline='\n') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         for row in csv_reader:
-            # x**2 + y**2
-            files_data.append([int(row[0]), float(row[2])**2 + float(row[3])**2,
+            files_data.append([int(row[0]), float(row[2]), float(row[3]), float(row[4]),
                                1 if row[1] == 'True' else 0])
 
 df = pd.DataFrame(np.array(files_data),
-                  columns=['frame_no', 'distance', 'label'])
+                  columns=['frame_no', 'x', 'y', 'z', 'label'])
 
 _8p = round(len(df) * 0.8)
 train = df[:_8p]
@@ -48,21 +45,18 @@ y_test = test[target_column_test].values
 print(X_test.shape)
 print(y_test.shape)
 
-dtree = DecisionTreeClassifier(max_depth=8)
+dtree = DecisionTreeClassifier(max_depth=20)
 dtree.fit(X_train, y_train)
 
-# Code lines 1 to 3
 pred_train_tree = dtree.predict(X_train)
 print("train MSE: {0}".format(
     np.sqrt(mean_squared_error(y_train, pred_train_tree))))
 print("train accuracy: {0}".format(r2_score(y_train, pred_train_tree)))
 
-# Code lines 4 to 6
 pred_test_tree = dtree.predict(X_test)
 print("test MSE: {0}".format(
     np.sqrt(mean_squared_error(y_test, pred_test_tree))))
 print("test accuracy: {0}".format(r2_score(y_test, pred_test_tree)))
 
-plot_tree(dtree, feature_names=train[predictors_train].columns,
-          class_names=train[target_column_train].columns, filled=True, fontsize=6, rounded=True)
-plt.show()
+# plot_tree(dtree)
+# plt.show()
