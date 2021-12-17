@@ -1,3 +1,4 @@
+from utils import to_float, angle_between
 from glob import glob
 import csv
 
@@ -23,11 +24,16 @@ for f in csv_files:
             nose_x, nose_y, nose_z = to_float(row[2:5])
             l_sh_x, l_sh_y, l_sh_z = to_float(row[5:8])
             r_sh_x, r_sh_y, r_sh_z = to_float(row[8:11])
-            files_data.append([nose_x, nose_y, nose_z, l_sh_x, l_sh_y, l_sh_z, r_sh_x, r_sh_y, r_sh_z,
+            center_sh_x = (r_sh_x + l_sh_x) / 2.0
+            center_sh_y = (r_sh_y + l_sh_y) / 2.0
+            center_sh_z = (r_sh_z + l_sh_z) / 2.0
+            nose_center_sh_angle = angle_between(
+                (center_sh_x, center_sh_y, center_sh_z), (nose_x, nose_y, nose_z))
+            files_data.append([nose_x, nose_y, nose_z, nose_center_sh_angle,
                                1 if row[1] == 'True' else 0])
 
 df = pd.DataFrame(np.array(files_data),
-                  columns=['nose_x', 'nose_y', 'nose_z', 'l_sh_x', 'l_sh_y', 'l_sh_z', 'r_sh_x', 'r_sh_y', 'r_sh_z', 'label'])
+                  columns=['nx', 'ny', 'nz', 'a1', 'label'])
 
 num_samples = len(df)
 _80p = round(0.8 * num_samples)

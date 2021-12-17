@@ -1,3 +1,4 @@
+from utils import to_float, angle_between
 from glob import glob
 import csv
 
@@ -6,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn import svm
 from sklearn.linear_model import SGDClassifier
 
@@ -16,30 +17,6 @@ from sklearn.metrics import mean_squared_error
 csv_files = glob('out/*.csv')
 files_data = []
 window = 10
-
-
-def to_float(l):
-    return list(map(lambda n: float(n), l))
-
-
-def unit_vector(vector):
-    """ Returns the unit vector of the vector.  """
-    return vector / np.linalg.norm(vector)
-
-
-def angle_between(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'::
-
-            >>> angle_between((1, 0, 0), (0, 1, 0))
-            1.5707963267948966
-            >>> angle_between((1, 0, 0), (1, 0, 0))
-            0.0
-            >>> angle_between((1, 0, 0), (-1, 0, 0))
-            3.141592653589793
-    """
-    v1_u = unit_vector(v1)
-    v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
 for f in csv_files:
@@ -60,24 +37,26 @@ for f in csv_files:
             nose_x, nose_y, nose_z = to_float(row[2:5])
             l_sh_x, l_sh_y, l_sh_z = to_float(row[5:8])
             r_sh_x, r_sh_y, r_sh_z = to_float(row[8:11])
-            center_sh_x = (r_sh_x + l_sh_x) / 2
-            center_sh_y = (r_sh_y + l_sh_y) / 2
-            center_sh_z = (r_sh_z + l_sh_z) / 2
-            sh_angle = angle_between(
-                (l_sh_x, l_sh_y, l_sh_z), (r_sh_x, r_sh_y, r_sh_z))
+            center_sh_x = (r_sh_x + l_sh_x) / 2.0
+            center_sh_y = (r_sh_y + l_sh_y) / 2.0
+            center_sh_z = (r_sh_z + l_sh_z) / 2.0
+            # sh_angle = angle_between(
+            #     (l_sh_x, l_sh_y, l_sh_z), (r_sh_x, r_sh_y, r_sh_z))
             nose_center_sh_angle = angle_between(
                 (center_sh_x, center_sh_y, center_sh_z), (nose_x, nose_y, nose_z))
 
+            d_nose_x = nose_x - d_nose_x
             d_nose_y = nose_y - d_nose_y
+            d_nose_z = nose_z - d_nose_z
             d_nose_center_sh_angle = nose_center_sh_angle - d_nose_center_sh_angle
-            d_sh_angle = sh_angle - d_sh_angle
+            # d_sh_angle = sh_angle - d_sh_angle
 
             if falling == 1:
                 n_falling += 1
 
             if idx % window == 0:
                 files_data.append(
-                    [d_nose_y/window, d_nose_center_sh_angle/window, d_sh_angle/window, 1 if n_falling > window / 2 else 0])
+                    [d_nose_x/window, d_nose_y/window, d_nose_z/window, d_nose_center_sh_angle/window, 1 if n_falling > window / 2 else 0])
                 d_nose_x = 0
                 d_nose_y = 0
                 d_nose_z = 0
@@ -89,7 +68,7 @@ for f in csv_files:
                 d_sh_angle = 0
 
 df = pd.DataFrame(np.array(files_data),
-                  columns=['1', '2', '3', 'label'])
+                  columns=['nx', 'ny', 'nz', 'a1', 'label'])
 
 label_column = ['label']
 non_label_col = list(set(list(df.columns))-set(label_column))
@@ -104,6 +83,9 @@ clf = RandomForestClassifier(
     max_depth=15, criterion='entropy')
 # clf = svm.SVC(C=0.2)
 # clf = SGDClassifier()
+# clf = GradientBoostingClassifier()
+# clf = AdaBoostClassifier()
+
 clf.fit(X_train, y_train.ravel())
 
 pred_train_tree = clf.predict(X_train)
