@@ -41,5 +41,5 @@ print("test MSE: {0}".format(
     np.sqrt(mean_squared_error(y_test, pred_test_tree))))
 print("test accuracy: {0}".format(r2_score(y_test, pred_test_tree)))
 
-# plot_tree(clf)
+# plot_tree(clf.estimators_[0])
 # plt.show()
