@@ -78,10 +78,8 @@ with mp_pose.Pose(
                 landmark_data.append([landmark.x, landmark.y, landmark.z])
             video_data.append([count, falling, *flatten(landmark_data)])
 
-            # print(video_data)
-            # exit()
-            frame.flags.writeable = True
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            # frame.flags.writeable = True
+            # frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             # mp_drawing.draw_landmarks(
             #     frame,
             #     results.pose_landmarks,
