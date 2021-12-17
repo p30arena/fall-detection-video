@@ -27,13 +27,16 @@ for f in csv_files:
             center_sh_x = (r_sh_x + l_sh_x) / 2.0
             center_sh_y = (r_sh_y + l_sh_y) / 2.0
             center_sh_z = (r_sh_z + l_sh_z) / 2.0
-            nose_center_sh_angle = angle_between(
-                (center_sh_x, center_sh_y, center_sh_z), (nose_x, nose_y, nose_z))
-            files_data.append([nose_x, nose_y, nose_z, nose_center_sh_angle,
+            v_c_n_x = nose_x - center_sh_x
+            v_c_n_y = nose_y - center_sh_y
+            v_c_n_z = nose_z - center_sh_z
+            # nose_center_sh_angle = angle_between(
+            #     (center_sh_x, center_sh_y, center_sh_z), (nose_x, nose_y, nose_z))
+            files_data.append([nose_x, nose_y, nose_z, v_c_n_x, v_c_n_y, v_c_n_z,
                                1 if row[1] == 'True' else 0])
 
 df = pd.DataFrame(np.array(files_data),
-                  columns=['nx', 'ny', 'nz', 'a1', 'label'])
+                  columns=['nx', 'ny', 'nz', 'cx', 'cy', 'cz', 'label'])
 
 num_samples = len(df)
 _80p = round(0.8 * num_samples)
