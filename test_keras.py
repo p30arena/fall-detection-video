@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 
-from keras_ds import df
+from keras_ds import df, sequence_length
 
 model = keras.models.load_model('out/model/model_checkpoint.h5')
 
@@ -18,7 +18,7 @@ print(y.shape)
 dataset = keras.preprocessing.timeseries_dataset_from_array(
     X,
     y,
-    sequence_length=20,
+    sequence_length=sequence_length,
     sampling_rate=1,
     batch_size=64,
 )
@@ -48,5 +48,7 @@ for _, (x, y) in enumerate(dataset):
             if truth == pred:
                 n_pred_fall += 1
 
-print("fall accuracy: {0}".format(n_pred_fall / n_truth_fall))
-print("non fall accuracy: {0}".format(n_pred_non_fall / n_truth_non_fall))
+    print(
+        "fall accuracy: {0}   -   {1}".format(n_pred_fall / n_truth_fall, n_truth_fall))
+    print("non fall accuracy: {0}   -   {1}".format(
+        n_pred_non_fall / n_truth_non_fall, n_truth_non_fall))

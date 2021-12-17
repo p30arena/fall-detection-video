@@ -67,8 +67,3 @@ def visualize_loss(history, title):
 
 
 visualize_loss(history, "Training and Validation Loss")
-
-
-for x, y in dataset_val.take(5):
-    print("truth: {0} prediction: {1}".format(y[0].numpy()[0], 0 if tf.sigmoid(
-        model.predict(x)[0]) < 0.5 else 1))

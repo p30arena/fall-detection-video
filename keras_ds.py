@@ -8,16 +8,26 @@ from tensorflow import keras
 csv_files = glob('out/*.csv')
 files_data = []
 df = None
+sequence_length = 10
+batch_size = 256
+
+
+def to_float(l):
+    return list(map(lambda n: float(n), l))
+
 
 for f in csv_files:
     with open(f, newline='\n') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         for row in csv_reader:
-            files_data.append([float(row[2]), float(row[3]),
+            nose_x, nose_y, nose_z = to_float(row[2:5])
+            l_sh_x, l_sh_y, l_sh_z = to_float(row[5:8])
+            r_sh_x, r_sh_y, r_sh_z = to_float(row[8:11])
+            files_data.append([nose_x, nose_y, nose_z, l_sh_x, l_sh_y, l_sh_z, r_sh_x, r_sh_y, r_sh_z,
                                1 if row[1] == 'True' else 0])
 
 df = pd.DataFrame(np.array(files_data),
-                  columns=['x', 'y', 'label'])
+                  columns=['nose_x', 'nose_y', 'nose_z', 'l_sh_x', 'l_sh_y', 'l_sh_z', 'r_sh_x', 'r_sh_y', 'r_sh_z', 'label'])
 
 num_samples = len(df)
 _80p = round(0.8 * num_samples)
@@ -57,17 +67,17 @@ print(y_test.shape)
 dataset_train = keras.preprocessing.timeseries_dataset_from_array(
     X_train,
     y_train,
-    sequence_length=20,
+    sequence_length=sequence_length,
     sampling_rate=1,
-    batch_size=64,
+    batch_size=batch_size,
 )
 
 dataset_val = keras.preprocessing.timeseries_dataset_from_array(
     X_val,
     y_val,
-    sequence_length=20,
+    sequence_length=sequence_length,
     sampling_rate=1,
-    batch_size=64,
+    batch_size=batch_size,
 )
 
 for batch in dataset_train.take(1):
