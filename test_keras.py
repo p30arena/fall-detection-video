@@ -31,8 +31,8 @@ n_pred_fall = 0
 n_pred_non_fall = 0
 
 for _, (x, y) in enumerate(dataset):
-    # print(x.shape)
-    # print(y.shape)
+    print(x.shape)
+    print(y.shape)
     print(_)
     for idx, input in enumerate(x):
         truth = y[idx].numpy()[0]

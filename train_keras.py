@@ -46,7 +46,7 @@ modelckpt_callback = keras.callbacks.ModelCheckpoint(
 
 history = model.fit(
     dataset_train,
-    epochs=50,
+    epochs=100,
     validation_data=dataset_val,
     callbacks=[es_callback, modelckpt_callback],
 )

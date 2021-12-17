@@ -1,42 +1,9 @@
-from utils import to_float, angle_between
-from glob import glob
-import csv
-
-import numpy as np
-import pandas as pd
+from utils import get_df
 from tensorflow import keras
 
-csv_files = glob('out/*.csv')
-files_data = []
-df = None
-sequence_length = 10
 batch_size = 256
 
-
-def to_float(l):
-    return list(map(lambda n: float(n), l))
-
-
-for f in csv_files:
-    with open(f, newline='\n') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',')
-        for row in csv_reader:
-            nose_x, nose_y, nose_z = to_float(row[2:5])
-            l_sh_x, l_sh_y, l_sh_z = to_float(row[5:8])
-            r_sh_x, r_sh_y, r_sh_z = to_float(row[8:11])
-            center_sh_x = (r_sh_x + l_sh_x) / 2.0
-            center_sh_y = (r_sh_y + l_sh_y) / 2.0
-            center_sh_z = (r_sh_z + l_sh_z) / 2.0
-            v_c_n_x = nose_x - center_sh_x
-            v_c_n_y = nose_y - center_sh_y
-            v_c_n_z = nose_z - center_sh_z
-            # nose_center_sh_angle = angle_between(
-            #     (center_sh_x, center_sh_y, center_sh_z), (nose_x, nose_y, nose_z))
-            files_data.append([nose_x, nose_y, nose_z, v_c_n_x, v_c_n_y, v_c_n_z,
-                               1 if row[1] == 'True' else 0])
-
-df = pd.DataFrame(np.array(files_data),
-                  columns=['nx', 'ny', 'nz', 'cx', 'cy', 'cz', 'label'])
+df, sequence_length = get_df()
 
 num_samples = len(df)
 _80p = round(0.8 * num_samples)
