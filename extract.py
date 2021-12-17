@@ -4,8 +4,6 @@ import csv
 import cv2
 import mediapipe as mp
 
-from ant import annotations
-
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
@@ -15,22 +13,34 @@ def flatten(t):
     return [item for sublist in t for item in sublist]
 
 
+def get_annotation(path):
+    try:
+        return list(map(lambda n: int(n), open(path, 'r').readlines()[:2]))
+    except Exception as e:
+        print(e)
+        return [0, 0]
+
+
 video_files = glob('data/*/Videos/*.avi')
 
 landmark_keys = [
-    # mp_pose.PoseLandmark.LEFT_SHOULDER,
-    # mp_pose.PoseLandmark.RIGHT_SHOULDER,
+    mp_pose.PoseLandmark.NOSE,
+    mp_pose.PoseLandmark.LEFT_SHOULDER,
+    mp_pose.PoseLandmark.RIGHT_SHOULDER,
     # mp_pose.PoseLandmark.LEFT_ELBOW,
     # mp_pose.PoseLandmark.RIGHT_ELBOW,
-    mp_pose.PoseLandmark.LEFT_WRIST,
-    mp_pose.PoseLandmark.RIGHT_WRIST,
+    # mp_pose.PoseLandmark.LEFT_WRIST,
+    # mp_pose.PoseLandmark.RIGHT_WRIST,
 ]
 
 with mp_pose.Pose(
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5) as pose:
     for i, f in enumerate(video_files):
-        fb, fe = annotations[i]
+        file_path = Path(f)
+        annotation = get_annotation(str(file_path.parent.parent.joinpath(
+            './Annotation_files/{0}.txt'.format(file_path.name.split('.')[0]))))
+        fb, fe = annotation
         cap = cv2.VideoCapture(f)
         count = 0
         count_failed = 0
@@ -42,7 +52,7 @@ with mp_pose.Pose(
             count = count + 1
 
             falling = False
-            if count >= fb and count <= fe:
+            if fb != fe and count >= fb and count <= fe:
                 falling = True
 
             frame.flags.writeable = False

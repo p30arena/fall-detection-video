@@ -12,16 +12,36 @@ from sklearn.metrics import mean_squared_error
 csv_files = glob('out/*.csv')
 files_data = []
 df = None
+window = 10
 
 for f in csv_files:
     with open(f, newline='\n') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
-        for row in csv_reader:
-            files_data.append([int(row[0]), float(row[2]), float(row[3]), float(row[4]),
-                               1 if row[1] == 'True' else 0])
+        d_lw_x = 0
+        d_lw_y = 0
+        d_lw_z = 0
+        n_falling = 0
+        for idx, row in enumerate(csv_reader):
+            frame_no = int(row[0])
+            falling = 1 if row[1] == 'True' else 0
+            lw_x = float(row[2])
+            lw_y = float(row[3])
+            lw_z = float(row[4])
+            d_lw_x = lw_x - d_lw_x
+            d_lw_y = lw_y - d_lw_y
+            d_lw_z = lw_z - d_lw_z
+            if falling == 1:
+                n_falling += 1
+            if idx % window == 0:
+                files_data.append(
+                    [d_lw_x/window, d_lw_y/window, d_lw_z/window, 1 if n_falling > window / 2 else 0])
+                d_lw_x = 0
+                d_lw_y = 0
+                d_lw_z = 0
+                n_falling = 0
 
 df = pd.DataFrame(np.array(files_data),
-                  columns=['frame_no', 'x', 'y', 'z', 'label'])
+                  columns=['delta_x', 'delta_y', 'delta_z', 'label'])
 
 _8p = round(len(df) * 0.8)
 train = df[:_8p]
@@ -45,7 +65,7 @@ y_test = test[target_column_test].values
 print(X_test.shape)
 print(y_test.shape)
 
-dtree = DecisionTreeClassifier(max_depth=20)
+dtree = DecisionTreeClassifier(max_depth=10)
 dtree.fit(X_train, y_train)
 
 pred_train_tree = dtree.predict(X_train)

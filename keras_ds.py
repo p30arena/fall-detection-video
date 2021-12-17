@@ -9,17 +9,15 @@ csv_files = glob('out/*.csv')
 files_data = []
 df = None
 
-pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
-             columns=['a', 'b', 'c'])
 for f in csv_files:
     with open(f, newline='\n') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         for row in csv_reader:
-            files_data.append([float(row[2]), float(row[3]), float(row[4]),
+            files_data.append([float(row[2]), float(row[3]),
                                1 if row[1] == 'True' else 0])
 
 df = pd.DataFrame(np.array(files_data),
-                  columns=['x', 'y', 'z', 'label'])
+                  columns=['x', 'y', 'label'])
 
 num_samples = len(df)
 _80p = round(0.8 * num_samples)
@@ -59,7 +57,7 @@ print(y_test.shape)
 dataset_train = keras.preprocessing.timeseries_dataset_from_array(
     X_train,
     y_train,
-    sequence_length=5,
+    sequence_length=20,
     sampling_rate=1,
     batch_size=64,
 )
@@ -67,7 +65,7 @@ dataset_train = keras.preprocessing.timeseries_dataset_from_array(
 dataset_val = keras.preprocessing.timeseries_dataset_from_array(
     X_val,
     y_val,
-    sequence_length=5,
+    sequence_length=20,
     sampling_rate=1,
     batch_size=64,
 )

@@ -4,13 +4,32 @@ from tensorflow import keras
 
 from keras_ds import inputs, dataset_train, dataset_val
 
+# inputs = keras.layers.Input(shape=(inputs.shape[1], inputs.shape[2]))
+# lstm_out = keras.layers.LSTM(32)(inputs)
+# outputs = keras.layers.Dense(1)(lstm_out)
+
 inputs = keras.layers.Input(shape=(inputs.shape[1], inputs.shape[2]))
-lstm_out = keras.layers.LSTM(32)(inputs)
-outputs = keras.layers.Dense(1)(lstm_out)
+
+conv1 = keras.layers.Conv1D(
+    filters=64, kernel_size=3, padding="same")(inputs)
+conv1 = keras.layers.BatchNormalization()(conv1)
+conv1 = keras.layers.ReLU()(conv1)
+
+conv2 = keras.layers.Conv1D(filters=64, kernel_size=3, padding="same")(conv1)
+conv2 = keras.layers.BatchNormalization()(conv2)
+conv2 = keras.layers.ReLU()(conv2)
+
+conv3 = keras.layers.Conv1D(filters=64, kernel_size=3, padding="same")(conv2)
+conv3 = keras.layers.BatchNormalization()(conv3)
+conv3 = keras.layers.ReLU()(conv3)
+
+gap = keras.layers.GlobalAveragePooling1D()(conv3)
+
+outputs = keras.layers.Dense(1)(gap)
 
 model = keras.Model(inputs=inputs, outputs=outputs)
 model.compile(optimizer=keras.optimizers.Adam(
-    learning_rate=0.001), loss=tf.keras.losses.BinaryCrossentropy(from_logits=True))
+    learning_rate=0.0001), loss=tf.keras.losses.BinaryCrossentropy(from_logits=True))
 model.summary()
 
 path_checkpoint = "out/model/model_checkpoint.h5"
