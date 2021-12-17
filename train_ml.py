@@ -11,7 +11,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
-df, _ = get_df()
+df = get_df()
 
 label_column = ['label']
 non_label_col = list(set(list(df.columns))-set(label_column))

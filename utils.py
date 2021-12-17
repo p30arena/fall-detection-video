@@ -31,7 +31,7 @@ def angle_between(v1, v2) -> float:
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def get_df_keras(window=10) -> Tuple[DataFrame, int]:
+def get_df_keras() -> DataFrame:
     files_data = []
     csv_files = glob('out/*.csv')
     for f in csv_files:
@@ -53,10 +53,10 @@ def get_df_keras(window=10) -> Tuple[DataFrame, int]:
                                    1 if row[1] == 'True' else 0])
 
     return pd.DataFrame(np.array(files_data),
-                        columns=['nx', 'ny', 'nz', 'cx', 'cy', 'cz', 'label']), window
+                        columns=['nx', 'ny', 'nz', 'cx', 'cy', 'cz', 'label'])
 
 
-def get_df(window=10) -> Tuple[DataFrame, int]:
+def get_df(window=10) -> DataFrame:
     files_data = []
     csv_files = glob('out/*.csv')
     for f in csv_files:
@@ -120,4 +120,4 @@ def get_df(window=10) -> Tuple[DataFrame, int]:
                     d_sh_angle = 0
 
     return pd.DataFrame(np.array(files_data),
-                        columns=['nx', 'ny', 'nz', 'cx', 'cy', 'cz', 'label']), window
+                        columns=['nx', 'ny', 'nz', 'cx', 'cy', 'cz', 'label'])
