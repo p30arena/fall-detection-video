@@ -24,6 +24,7 @@ def get_annotation(path):
 video_files = glob('data/*/Videos/*.avi')
 
 with mp_pose.Pose(
+        model_complexity=2,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5) as pose:
     for i, f in enumerate(video_files):
@@ -59,8 +60,8 @@ with mp_pose.Pose(
                 results.pose_landmarks,
                 mp_pose.POSE_CONNECTIONS,
                 landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-            cv2.imwrite("out/{0}/{1}-{2}.jpg".format(1 if falling else 0,
-                                                     Path(f).name, count), frame)
+            cv2.imwrite("out/jpg/{0}/{1}-{2}.jpg".format(1 if falling else 0,
+                                                         Path(f).name, count), frame)
         cap.release()
         print("{0} frames processed".format(count))
         print("{0} frames failed to process".format(count_failed))
