@@ -2,7 +2,6 @@ from pathlib import Path
 from glob import glob
 import csv
 import cv2
-import json
 import mediapipe as mp
 
 mp_drawing = mp.solutions.drawing_utils
