@@ -1,4 +1,4 @@
-from utils import get_df
+from utils import get_df, get_df_keras
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +11,8 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
-df = get_df()
+# df = get_df()
+df = get_df_keras()
 
 label_column = ['label']
 non_label_col = list(set(list(df.columns))-set(label_column))
@@ -23,7 +24,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y)
 # clf = DecisionTreeClassifier(
 #     max_depth=15, criterion='entropy')
 clf = RandomForestClassifier(
-    max_depth=15, criterion='entropy')
+    max_depth=20, criterion='entropy')
 # clf = svm.SVC(C=0.2)
 # clf = SGDClassifier()
 # clf = GradientBoostingClassifier()

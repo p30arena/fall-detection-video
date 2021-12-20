@@ -4,13 +4,11 @@ import csv
 import cv2
 import mediapipe as mp
 
+from utils import flatten
+
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
-
-
-def flatten(t):
-    return [item for sublist in t for item in sublist]
 
 
 def get_annotation(path):

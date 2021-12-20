@@ -1,9 +1,10 @@
+from pathlib import Path
 from glob import glob
 import csv
 import numpy as np
 
 import mediapipe as mp
-from utils import to_float
+from utils import to_float, center_vector
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -47,19 +48,64 @@ csv_files = glob('out/pose-preds/*.csv')
 #   LEFT_FOOT_INDEX = 31
 #   RIGHT_FOOT_INDEX = 32
 
+n_total_frames = 0
+n_falling_frames = 0
+n_errors = 0
+n_falling_errors = 0
+
 for f in csv_files:
+    file_path = Path(f)
+    new_file = str(file_path.parent.parent.joinpath(
+        './filtered-pose/{0}'.format(file_path.name)))
+
     with open(f, newline='\n') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',')
-        for idx, row in enumerate(csv_reader):
-            frame_no, falling = row[:2]
-            frame_no = int(frame_no)
-            falling = 1 if falling == 'True' else 0
+        with open(new_file, 'w', newline='\n') as new_csvfile:
+            csv_reader = csv.reader(csvfile, delimiter=',')
+            csv_writer = csv.writer(new_csvfile, delimiter=',')
+            for idx, row in enumerate(csv_reader):
+                n_total_frames += 1
 
-            landmarks = np.array(to_float(row[2:]))
-            la2 = landmarks.reshape((33, 4))
-            _, _, _, v_left_foot = la2[mp_pose.PoseLandmark.LEFT_FOOT_INDEX]
-            _, _, _, v_right_foot = la2[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX]
+                frame_no, falling = row[:2]
+                frame_no = int(frame_no)
+                falling = 1 if falling == 'True' else 0
 
-            if v_left_foot < 0.1 and v_right_foot < 0.1:
-                print(v_left_foot)
-                print(v_right_foot)
+                if falling == 1:
+                    n_falling_frames += 1
+
+                landmarks = np.array(to_float(row[2:]))
+                la2 = landmarks.reshape((33, 4))
+                _, _, _, v_left_foot = la2[mp_pose.PoseLandmark.LEFT_FOOT_INDEX]
+                _, _, _, v_right_foot = la2[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX]
+                _, _, _, v_left_hip = la2[mp_pose.PoseLandmark.LEFT_HIP]
+                _, _, _, v_right_hip = la2[mp_pose.PoseLandmark.RIGHT_HIP]
+                _, _, _, v_left_shoulder = la2[mp_pose.PoseLandmark.LEFT_SHOULDER]
+                _, _, _, v_right_shoulder = la2[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+
+                if v_left_foot < 0.1 and v_right_foot < 0.1 or \
+                        v_left_hip < 0.1 and v_right_hip < 0.1 or \
+                    v_left_shoulder < 0.1 and v_right_shoulder < 0.1:
+                    # print(falling)
+                    # print(v_left_foot)
+                    # print(v_right_foot)
+                    n_errors += 1
+                    if falling == 1:
+                        n_falling_errors += 1
+                    continue
+
+                # x_left_hip, y_left_hip, z_left_hip, _ = la2[mp_pose.PoseLandmark.LEFT_HIP]
+                # x_right_hip, y_right_hip, z_right_hip, _ = la2[mp_pose.PoseLandmark.RIGHT_HIP]
+
+                # print(x_left_hip)
+
+                # center_hip = center_vector(
+                #     la2[mp_pose.PoseLandmark.LEFT_HIP][:3], la2[mp_pose.PoseLandmark.RIGHT_HIP][:3])
+                # print(center_hip)
+                center_shoulders = center_vector(la2[mp_pose.PoseLandmark.LEFT_SHOULDER]
+                                                 [:3].tolist(), la2[mp_pose.PoseLandmark.RIGHT_SHOULDER][:3].tolist())
+                csv_writer.writerow(
+                    [frame_no, falling, *center_shoulders])
+
+print('n_errors: {0}'.format(n_errors))
+print('n_total_frames: {0}'.format(n_total_frames))
+print('n_falling_frames: {0}'.format(n_falling_frames))
+print('n_falling_errors: {0}'.format(n_falling_errors))

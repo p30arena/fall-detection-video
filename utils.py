@@ -11,6 +11,18 @@ def to_float(l) -> List[float]:
     return list(map(lambda n: float(n), l))
 
 
+def flatten(t):
+    return [item for sublist in t for item in sublist]
+
+
+def center_vector(v1, v2):
+    c_x = (v1[0] + v2[0]) / 2.0
+    c_y = (v1[1] + v2[1]) / 2.0
+    c_z = (v1[2] + v2[2]) / 2.0
+
+    return [c_x, c_y, c_z]
+
+
 def unit_vector(vector):
     """ Returns the unit vector of the vector.  """
     return vector / np.linalg.norm(vector)
@@ -33,18 +45,15 @@ def angle_between(v1, v2) -> float:
 
 def get_df_keras() -> DataFrame:
     files_data = []
-    csv_files = glob('out/*.csv')
+    csv_files = glob('out/filtered-pose/*.csv')
     for f in csv_files:
         with open(f, newline='\n') as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',')
             for row in csv_reader:
-                l_sh_x, l_sh_y, l_sh_z = to_float(row[5:8])
-                r_sh_x, r_sh_y, r_sh_z = to_float(row[8:11])
-                c_sh_x = (r_sh_x + l_sh_x) / 2.0
-                c_sh_y = (r_sh_y + l_sh_y) / 2.0
-                c_sh_z = (r_sh_z + l_sh_z) / 2.0
+                falling = int(row[1])
+                c_sh_x, c_sh_y, c_sh_z = to_float(row[2:5])
                 files_data.append([c_sh_x, c_sh_y, c_sh_z,
-                                   1 if row[1] == 'True' else 0])
+                                   falling])
 
     return pd.DataFrame(np.array(files_data),
                         columns=['cx', 'cy', 'cz', 'label'])
@@ -52,7 +61,7 @@ def get_df_keras() -> DataFrame:
 
 def get_df(window=10) -> DataFrame:
     files_data = []
-    csv_files = glob('out/*.csv')
+    csv_files = glob('out/filtered-pose/*.csv')
     for f in csv_files:
         with open(f, newline='\n') as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',')
@@ -62,12 +71,8 @@ def get_df(window=10) -> DataFrame:
             n_falling = 0
             for idx, row in enumerate(csv_reader):
                 frame_no = int(row[0])
-                falling = 1 if row[1] == 'True' else 0
-                l_sh_x, l_sh_y, l_sh_z = to_float(row[5:8])
-                r_sh_x, r_sh_y, r_sh_z = to_float(row[8:11])
-                c_sh_x = (r_sh_x + l_sh_x) / 2.0
-                c_sh_y = (r_sh_y + l_sh_y) / 2.0
-                c_sh_z = (r_sh_z + l_sh_z) / 2.0
+                falling = int(row[1])
+                c_sh_x, c_sh_y, c_sh_z = to_float(row[2:5])
                 d_c_sh_x = c_sh_x - d_c_sh_x
                 d_c_sh_y = c_sh_y - d_c_sh_y
                 d_c_sh_z = c_sh_z - d_c_sh_z
