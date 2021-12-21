@@ -81,9 +81,9 @@ for f in csv_files:
                 _, _, _, v_left_shoulder = la2[mp_pose.PoseLandmark.LEFT_SHOULDER]
                 _, _, _, v_right_shoulder = la2[mp_pose.PoseLandmark.RIGHT_SHOULDER]
 
-                if (v_left_foot < 0.1 and v_right_foot < 0.1) or \
-                        (v_left_hip < 0.1 and v_right_hip < 0.1) or \
-                    (v_left_shoulder < 0.1 or v_right_shoulder < 0.1):
+                if (v_left_foot < 0.1 or v_right_foot < 0.1) or \
+                        (v_left_hip < 0.1 or v_right_hip < 0.1) or \
+                (v_left_shoulder < 0.1 or v_right_shoulder < 0.1):
                     # print(falling)
                     # print(v_left_foot)
                     # print(v_right_foot)
@@ -102,8 +102,10 @@ for f in csv_files:
                 # print(center_hip)
                 center_shoulders = center_vector(la2[mp_pose.PoseLandmark.LEFT_SHOULDER]
                                                  [:3].tolist(), la2[mp_pose.PoseLandmark.RIGHT_SHOULDER][:3].tolist())
+                center_feet = center_vector(la2[mp_pose.PoseLandmark.LEFT_FOOT_INDEX]
+                                            [:3].tolist(), la2[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX][:3].tolist())
                 csv_writer.writerow(
-                    [frame_no, falling, *center_shoulders])
+                    [frame_no, falling, *center_shoulders, *center_feet])
 
 print('n_errors: {0}'.format(n_errors))
 print('n_total_frames: {0}'.format(n_total_frames))

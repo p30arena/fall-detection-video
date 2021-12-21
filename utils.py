@@ -103,7 +103,7 @@ def get_df_ex(window=10) -> DataFrame:
             for idx, row in enumerate(csv_reader):
                 frame_no = int(row[0])
                 falling = int(row[1])
-                sub_data.append(to_float(row[2:5]))
+                sub_data.append(to_float(row[2:8]))
 
                 if falling == 1:
                     n_falling += 1
@@ -115,4 +115,4 @@ def get_df_ex(window=10) -> DataFrame:
                     sub_data = []
 
     return pd.DataFrame(np.array(files_data),
-                        columns=[*list(range(window * 3)), 'label'])
+                        columns=[*list(range(window * 6)), 'label'])
