@@ -3,10 +3,8 @@ from utils import get_df, get_df_keras, get_df_ex
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier, plot_tree
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
-from sklearn import svm
-from sklearn.linear_model import SGDClassifier
+from sklearn.tree import plot_tree
+from sklearn.ensemble import RandomForestClassifier
 
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
@@ -23,14 +21,8 @@ y = df[label_column].values
 
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-# clf = DecisionTreeClassifier(
-#     max_depth=15, criterion='entropy')
 clf = RandomForestClassifier(
-    max_depth=30, criterion='entropy')
-# clf = svm.SVC(C=0.2)
-# clf = SGDClassifier()
-# clf = GradientBoostingClassifier()
-# clf = AdaBoostClassifier()
+    n_estimators=300, max_depth=30, criterion='entropy')
 
 clf.fit(X_train, y_train.ravel())
 

@@ -110,7 +110,7 @@ def get_df_ex(window=10) -> DataFrame:
 
                 if len(sub_data) == window:
                     files_data.append(
-                        [*flatten(sub_data), 1 if n_falling > window / 3 else 0])
+                        [*flatten(sub_data), 1 if n_falling > window / 4 else 0])
                     n_falling = 0
                     sub_data = []
 
