@@ -1,12 +1,12 @@
-from utils import get_df, get_df_keras
+from utils import get_df, get_df_keras, get_df_ex
 from tensorflow import keras
 
 batch_size = 256
 
-sequence_length = 10
-df = get_df_keras()
-# sequence_length = 1
-# df = get_df()
+# sequence_length = 10
+# df = get_df_keras()
+sequence_length = 1
+df = get_df_ex()
 
 num_samples = len(df)
 _80p = round(0.8 * num_samples)

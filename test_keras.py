@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 
-from keras_ds import df, sequence_length
+from keras_ds import df, sequence_length, batch_size
 
 model = keras.models.load_model('out/model/model_checkpoint.h5')
 
@@ -20,7 +20,7 @@ dataset = keras.preprocessing.timeseries_dataset_from_array(
     y,
     sequence_length=sequence_length,
     sampling_rate=1,
-    batch_size=64,
+    batch_size=batch_size,
 )
 
 # print(len(dataset))

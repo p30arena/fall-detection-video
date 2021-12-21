@@ -90,3 +90,29 @@ def get_df(window=10) -> DataFrame:
 
     return pd.DataFrame(np.array(files_data),
                         columns=['cx', 'cy', 'cz', 'label'])
+
+
+def get_df_ex(window=10) -> DataFrame:
+    files_data = []
+    csv_files = glob('out/filtered-pose/*.csv')
+    for f in csv_files:
+        with open(f, newline='\n') as csvfile:
+            csv_reader = csv.reader(csvfile, delimiter=',')
+            sub_data = []
+            n_falling = 0
+            for idx, row in enumerate(csv_reader):
+                frame_no = int(row[0])
+                falling = int(row[1])
+                sub_data.append(to_float(row[2:5]))
+
+                if falling == 1:
+                    n_falling += 1
+
+                if len(sub_data) == window:
+                    files_data.append(
+                        [*flatten(sub_data), 1 if n_falling > window / 3 else 0])
+                    n_falling = 0
+                    sub_data = []
+
+    return pd.DataFrame(np.array(files_data),
+                        columns=[*list(range(window * 3)), 'label'])
