@@ -5,7 +5,7 @@ from tensorflow import keras
 from keras_ds import inputs, dataset_train, dataset_val
 
 inputs = keras.layers.Input(shape=(inputs.shape[1], inputs.shape[2]))
-lstm_out = keras.layers.LSTM(32)(inputs)
+lstm_out = keras.layers.LSTM(64)(inputs)
 outputs = keras.layers.Dense(1)(lstm_out)
 
 # inputs = keras.layers.Input(shape=(inputs.shape[1], inputs.shape[2]))
